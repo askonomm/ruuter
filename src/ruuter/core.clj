@@ -1,6 +1,5 @@
 (ns ruuter.core
-  (:require [clojure.string :as string]
-            [org.httpkit.server :as http])
+  (:require [clojure.string :as string])
   (:gen-class))
 
 
@@ -75,29 +74,21 @@
      :body "Not found."}))
 
 
-(defn- router
+(defn route
   "For a given collection of `routes` and the current HTTP request as
   `req`, will attempt to match a route with the HTTP request, which it
-  will then try to return a response for.
+  will then try to return a response for. The only requirement for `req`
+  is to contain both a `uri` and `request-method` key. First should match
+  the request path (like the paths defined in routes) and the second
+  should match the request method used by the HTTP server you pass this fn to.
 
   If no route matched for a given HTTP request it will try to find a
   route with `:not-found` as its `:path` instead, and return the response
-  for that."
+  for that, and if that route was also not found, will return a built-in
+  404 response instead."
   [routes {:keys [uri request-method] :as req}]
   (if-let [route (match-route routes uri request-method)]
     (route+req->response route req)
     (route+req->response (->> routes
                               (filter #(= :not-found (:path %)))
                               first) req)))
-
-
-(defn route!
-  "Starts an HTTP server which will then try to find a matching route for
-  each request from within the given collection of `routes`. Takes an
-  optional `opts` map, which corresponds directly to http-kit's config,
-  allowing you to specify things like `{:port 8080}` and so on."
-  ([routes]
-   (route! routes {:port 9600}))
-  ([routes opts]
-   (println "Starting HTTP server on port " (:port opts))
-   (http/run-server #(router routes %) opts)))

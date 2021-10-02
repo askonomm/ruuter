@@ -10,30 +10,51 @@ A tiny HTTP router that operates with a simple data structure where each route i
 
 ### Setting up
 
-Require the namespace `ruuter.core` and then pass your routes to the `route!` function, like this:
+Require the namespace `ruuter.core` and then pass your routes to the `route` function along with the current request map, like this:
 
 ```clojure
 (ns myapp.core
   (:require [ruuter.core :as ruuter]))
 
-(defn -main [& opts]
-  (ruuter/route! [{:path "/"
-                   :method :get
-                   :response {:status 200
-                              :body "Hi there!"}}]))
-```
-
-This will start an HTTP server on a default port of 9600 using [http-kit](https://github.com/http-kit/http-kit) under the hood.
-
-The `route!` function also takes a second, optional argument, which is the [options map for http-kit](http://http-kit.github.io/http-kit/org.httpkit.server.html#var-run-server), allowing you to specify the port and so on, like this:
-
-```clojure
 (def routes [{:path "/"
               :method :get
               :response {:status 200
                          :body "Hi there!"}}])
 
-(ruuter/route! routes {:port 8080})
+(def request {:uri "/"
+              :request-method :get})
+
+(ruuter/route routes request) ; => {:status 200
+                              ;     :body "Hi there!"}
+```
+
+This will attempt to match a route with the request map and return the matched route' response. If no route was found, it will attempt to find a route that has a `:path` that is `:not-found`, and return its response instead. But if not even that route was found, it will simply return a built-in 404 response instead.
+
+Note that the `request-method` doesn't have to be a keyword, it can be anything that your HTTP server returns. But it does have to be called `request-method` for the router to know where to look for. 
+
+### Setting up with http-kit
+
+Now, obviously on its own the router is not very useful as it needs an actual HTTP server to, so here's an example that uses http-kit:
+
+```clojure
+(ns myapp.core
+  (:require [ruuter.core :as ruuter]
+            [org.httpkit.server :as http]))
+
+; The given request map (second argument) will match the
+; first route in this example, and return its response.
+(def routes [{:path "/"
+              :method :get
+              :response {:status 200
+                         :body "Hi there!"}}
+             {:path "/hello/:who"
+              :method :get
+              :response (fn [req]
+                          {:status 200
+                           :body (str "Hello, " (:who (:params req)))})}])
+
+(defn -main []
+  (http/run-server #(ruuter/route routes %) {:port 8080}))
 ```
 
 ### Creating routes
@@ -57,9 +78,7 @@ To create parameters from the path, prepend a colon (:) in front of a path slice
 
 #### `:method`
 
-The HTTP method to listen for when matching the given path.
-
-Accepted values are:
+The HTTP method to listen for when matching the given path. This can be whatever the HTTP server uses. For example, if you're using http-kit for the HTTP server then the accepted values are:
 
 - `:get`
 - `:post`
@@ -71,4 +90,27 @@ Accepted values are:
 
 #### `:response`
 
-The response can be a direct map, or a function returning a map. In case of a function, you will also get passed to you the `request` object. For better information on what are all the things you could do with a response, check out [the http-kit documentation](https://http-kit.github.io/server.html).
+The response can be a direct map, or a function returning a map. In case of a function, you will also get passed to you the `request` map that the HTTP server returns, with added-in `:params` that contain the values for the URL parameters you use in your route's `:path`.
+
+Thus, a `:response` can be a map:
+
+```clojure
+{:status 200
+ :body "Hi there!"}
+ ```
+
+Or a function returning a map:
+
+```clojure
+(fn [req]
+  {:status 200
+   :body "Hi there!"})
+ ```
+
+What the actual map can contain that you return depends again on the HTTP server you decided to use Ruuter with. The examples I've noted here are based on `http-kit`, but feel free to make a PR with additions for other HTTP servers.
+
+## Changelog
+
+### 1.1.0
+
+- Made Ruuter server-agnostic, which means now it really is just a router and nothing else, and can thus be used with just about any HTTP server you can throw at it. It also means there are now zero dependencies! ZERO!
