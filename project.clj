@@ -1,4 +1,4 @@
-(defproject org.clojars.askonomm/ruuter "1.0.0"
+(defproject org.clojars.askonomm/ruuter "1.0.1"
   :description "A tiny HTTP router"
   :url "https://github.com/askonomm/ruuter"
   :license {:name "MIT"
