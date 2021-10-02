@@ -1,6 +1,7 @@
 (ns ruuter.core
   (:require [clojure.string :as string]
-            [org.httpkit.server :as http]))
+            [org.httpkit.server :as http])
+  (:gen-class))
 
 
 (def routes [{:path "/"

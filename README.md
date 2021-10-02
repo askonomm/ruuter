@@ -2,6 +2,10 @@
 
 A tiny HTTP router that operates with a simple data structure where each route is a map inside a vector. Yup, that's it. No magic, no bullshit. 
 
+## Installation
+
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.askonomm/ruuter.svg)](https://clojars.org/org.clojars.askonomm/ruuter)
+
 ## Usage
 
 ### Setting up

@@ -7,4 +7,5 @@
                  [http-kit "2.5.3"]]
   :main ruuter.core
   :min-lein-version "2.0.0"
+  :aot [ruuter.core]
   :repl-options {:init-ns ruuter.core})
