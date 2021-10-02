@@ -59,6 +59,11 @@ Accepted values are:
 
 - `:get`
 - `:post`
+- `:put`
+- `:delete`
+- `:head`
+- `:options`
+- `:patch`
 
 #### `:response`
 
