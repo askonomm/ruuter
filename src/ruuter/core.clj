@@ -94,9 +94,10 @@
 (defn route!
   "Starts an HTTP server which will then try to find a matching route for
   each request from within the given collection of `routes`. Takes an
-  optional `opts` map, which corresponds directly to HTTP-Kit's config,
+  optional `opts` map, which corresponds directly to http-kit's config,
   allowing you to specify things like `{:port 8080}` and so on."
   ([routes]
    (route! routes {:port 9600}))
   ([routes opts]
+   (println "Starting HTTP server on port " (:port opts))
    (http/run-server #(router routes %) opts)))
