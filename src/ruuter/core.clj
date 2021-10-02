@@ -4,24 +4,6 @@
   (:gen-class))
 
 
-(def routes [{:path "/"
-              :method :get
-              :response {:status 200
-                         :body "Hello, World."}}
-             {:path "/some/page/goes/here"
-              :method :get
-              :response {:status 200
-                         :body ":)"}}
-             {:path "/hi/:name"
-              :method :get
-              :response (fn [req]
-                          {:status 200
-                           :body (str "Hi, " (:name (:params req)))})}
-             {:path :not-found
-              :response {:status 404
-                         :body "Not found."}}])
-
-
 (defn- path->regex-path
   [path]
   (if (= "/" path)
@@ -92,7 +74,3 @@
    (route! routes {:port 9600}))
   ([routes opts]
    (http/run-server #(router routes %) opts)))
-
-
-(defn -main [& opts]
-  (route! routes))
