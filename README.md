@@ -34,7 +34,7 @@ Note that the `request-method` doesn't have to be a keyword, it can be anything 
 
 ### Setting up with http-kit
 
-Now, obviously on its own the router is not very useful as it needs an actual HTTP server to, so here's an example that uses http-kit:
+Now, obviously on its own the router is not very useful as it needs an actual HTTP server to return the responses to the world, so here's an example that uses http-kit:
 
 ```clojure
 (ns myapp.core
