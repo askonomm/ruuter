@@ -41,8 +41,6 @@ Now, obviously on its own the router is not very useful as it needs an actual HT
   (:require [ruuter.core :as ruuter]
             [org.httpkit.server :as http]))
 
-; The given request map (second argument) will match the
-; first route in this example, and return its response.
 (def routes [{:path "/"
               :method :get
               :response {:status 200
@@ -66,8 +64,6 @@ Now, obviously on its own the router is not very useful as it needs an actual HT
   (:require [ruuter.core :as ruuter]
             [ring.adapter.jetty :as jetty]))
 
-; The given request map (second argument) will match the
-; first route in this example, and return its response.
 (def routes [{:path "/"
               :method :get
               :response {:status 200
@@ -132,7 +128,7 @@ Or a function returning a map:
    :body "Hi there!"})
  ```
 
-What the actual map can contain that you return depends again on the HTTP server you decided to use Ruuter with. The examples I've noted here are based on `http-kit`, but feel free to make a PR with additions for other HTTP servers.
+What the actual map can contain that you return depends again on the HTTP server you decided to use Ruuter with. The examples I've noted here are based on [http-kit](https://github.com/http-kit/http-kit) & [ring + jetty](https://github.com/ring-clojure/ring), but feel free to make a PR with additions for other HTTP servers.
 
 ## Changelog
 
