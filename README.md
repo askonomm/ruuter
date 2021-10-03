@@ -57,6 +57,31 @@ Now, obviously on its own the router is not very useful as it needs an actual HT
   (http/run-server #(ruuter/route routes %) {:port 8080}))
 ```
 
+### Setting up with [Ring + Jetty](https://github.com/ring-clojure/ring)
+
+[Ring + Jetty](https://github.com/ring-clojure/ring) set-up is almost identical to the one of http-kit, and looks like this:
+
+```clojure
+(ns myapp.core
+  (:require [ruuter.core :as ruuter]
+            [ring.adapter.jetty :as jetty]))
+
+; The given request map (second argument) will match the
+; first route in this example, and return its response.
+(def routes [{:path "/"
+              :method :get
+              :response {:status 200
+                         :body "Hi there!"}}
+             {:path "/hello/:who"
+              :method :get
+              :response (fn [req]
+                          {:status 200
+                           :body (str "Hello, " (:who (:params req)))})}])
+
+(defn -main []
+  (jetty/run-jetty #(ruuter/route routes %) {:port 8080}))
+```
+
 ### Creating routes
 
 Like mentioned above, each route is a map inside of a vector - the order is important only in that the route matcher will return the first result it finds according to `:path`. 
