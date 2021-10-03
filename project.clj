@@ -3,7 +3,8 @@
   :url "https://github.com/askonomm/ruuter"
   :license {:name "MIT"
             :url  "https://raw.githubusercontent.com/askonomm/ruuter/master/LICENSE.txt"}
-  :dependencies [[org.clojure/clojure "1.10.3"]]
+  :dependencies [[org.clojure/clojure "1.10.3"]
+                 [org.clojure/clojurescript "1.10.879"]]
   :plugins [[lein-cloverage "1.2.2"]]
   :main ruuter.core
   :min-lein-version "2.0.0"
