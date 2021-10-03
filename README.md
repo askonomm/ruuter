@@ -88,7 +88,7 @@ You can also use Ruuter with [Babashka](https://github.com/babashka/babashka), b
 (require '[org.httpkit.server :as http]
          '[babashka.deps :as deps])
 
-(deps/add-deps '{:deps {org.clojars.askonomm/ruuter {:mvn/version "1.1.0"}}})
+(deps/add-deps '{:deps {org.clojars.askonomm/ruuter {:mvn/version "1.2.1"}}})
 
 (require '[ruuter.core :as ruuter])
 
