@@ -2,31 +2,31 @@
   (:require [clojure.test :refer :all]
             [ruuter.core :as ruuter]))
 
-(deftest path->regex-path-test
-  (let [testfn #'ruuter/path->regex-path]
-    (testing "Converting a path to a regex path with no params"
-      (is (= "/hello/world" (testfn "/hello/world"))))
-    (testing "Converting a path to a regex path with params"
-      (is (= "/hello/.*" (testfn "/hello/:who")))
-      (is (= "/.*/.*/.*" (testfn "/:these/:are/:params"))))))
-
 
 (deftest path+uri->path-params-test
   (let [testfn #'ruuter/path+uri->path-params]
     (testing "No params returns an empty map"
-      (is (= {} (testfn "/hello/world" "/hello/world"))))
+      (is (= {}
+             (testfn "/hello/world" "/hello/world"))))
     (testing "Having a param returns a map accordingly"
-      (is (= {:who "world"} (testfn "/hello/:who" "/hello/world"))))
+      (is (= {:who "world"}
+             (testfn "/hello/:who" "/hello/world"))))
     (testing "Multiple params returns a map accordingly"
       (is (= {:who "world"
-              :why "because"} (testfn "/hello/:who/:why" "/hello/world/because"))))))
+              :why "because"}
+             (testfn "/hello/:who/:why" "/hello/world/because"))))
+    (testing "Multiple params, but one is optional"
+      (is (= {:who "world"}
+             (testfn "/hello/:who/:why?" "/hello/world")))
+      (is (= {:who "world"
+              :why "because"}
+             (testfn "/hello/:who/:why?" "/hello/world/because"))))))
 
 
 (deftest match-route-test
   (let [testfn #'ruuter/match-route]
     (testing "Find a route that exists"
       (is (= {:path "/hello"
-              :regex-path "/hello"
               :method :get
               :response {:status 200
                          :body "Hello."}}

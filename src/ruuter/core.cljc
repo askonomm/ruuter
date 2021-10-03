@@ -8,13 +8,24 @@
   match against the request URI."
   [path]
   (if (= "/" path)
-    path
+    "\\/"
     (->> (string/split path #"/")
-         (map (fn [piece]
-                (if (string/starts-with? piece ":")
-                  ".*"
-                  piece)))
-         (string/join "/"))))
+         (map #(cond
+                 ; matches anything, and must be present
+                 ; for example `:name`
+                 (and (string/starts-with? % ":")
+                      (not (string/ends-with? % "?")))
+                 ".*"
+                 ; matches anything, but is optional
+                 ; for example `:name?`
+                 (and (string/starts-with? % ":")
+                      (string/ends-with? % "?"))
+                 "?.*?"
+                 :else
+                 ; what comes around, goes around
+                 %))
+         (string/join "\\/")
+         (re-pattern))))
 
 
 (defn- path+uri->path-params
@@ -27,8 +38,19 @@
           split-uri (string/split uri #"/")]
       (into {} (map-indexed
                  (fn [idx item]
-                   (when (string/starts-with? item ":")
-                     {(keyword (subs item 1)) (get split-uri idx)}))
+                   (cond
+                     ; required parameter
+                     (and (string/starts-with? item ":")
+                          (not (string/ends-with? item "?")))
+                     {(keyword (subs item 1)) (get split-uri idx)}
+                     ; optional parameter
+                     (and (string/starts-with? item ":")
+                          (string/ends-with? item "?")
+                          (get split-uri idx))
+                     {(keyword (-> item
+                                   (subs 0 (- (count item) 1))
+                                   (subs 1)))
+                      (get split-uri idx)}))
                  split-path)))))
 
 
@@ -37,12 +59,14 @@
   the given `uri` and `request-method`. If none is matched, `nil` will
   be returned instead."
   [routes uri request-method]
-  (->> routes
-       (filter #(not (= :not-found (:path %))))
-       (map #(merge % {:regex-path (path->regex-path (:path %))}))
-       (filter #(and (re-matches (re-pattern (:regex-path %)) uri)
-                     (= (:method %) request-method)))
-       first))
+  (let [route (->> routes
+                   (filter #(not (= :not-found (:path %))))
+                   (map #(merge % {:regex-path (path->regex-path (:path %))}))
+                   (filter #(and (re-matches (:regex-path %) uri)
+                                 (= (:method %) request-method)))
+                   first)]
+    (when route
+      (dissoc route :regex-path))))
 
 
 (defn- route+req->response

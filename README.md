@@ -1,6 +1,6 @@
 # Ruuter
 
-A tiny HTTP router that operates with a simple data structure where each route is a map inside a vector. Yup, that's it. No magic, no bullshit. 
+A tiny, zero dependency HTTP router for Clojure(Script) that operates with a simple data structure where each route is a map inside a vector. Yup, that's it. No magic, no bullshit. 
 
 ## Installation
 
@@ -78,6 +78,30 @@ Now, obviously on its own the router is not very useful as it needs an actual HT
   (jetty/run-jetty #(ruuter/route routes %) {:port 8080}))
 ```
 
+### Setting up with [Babashka](https://github.com/babashka/babashka)
+
+You can also use Ruuter with [Babashka](https://github.com/babashka/babashka), by using the built-in http-kit server, for example. Either add the dependency in your `bb.edn` file or if you want to make the whole thing one-file-rules-them-all, then load it in with `deps/add-deps`, like below:
+
+```clojure
+#!/usr/bin/env bb
+
+(require '[org.httpkit.server :as http]
+         '[babashka.deps :as deps])
+
+(deps/add-deps '{:deps {org.clojars.askonomm/ruuter {:mvn/version "1.1.0"}}})
+
+(require '[ruuter.core :as ruuter])
+
+(def routes [{:path "/"
+              :method :get
+              :response {:status 200
+                         :body "Hi there!"}}])
+
+(http/run-server #(ruuter/route routes %) {:port 8082})
+
+@(promise)
+```
+
 ### Creating routes
 
 Like mentioned above, each route is a map inside of a vector - the order is important only in that the route matcher will return the first result it finds according to `:path`. 
@@ -88,7 +112,7 @@ Each route consists of three items:
 
 A string path starting with a forward slash describing the URL path to match. 
 
-To create parameters from the path, prepend a colon (:) in front of a path slice like you would with a Clojure keyword. For example a string such as `/hi/:name` would match any string that matches the `/hi/.*` regex. The `:name` itself will then be available with its value from the `request` passed to the response function, like this:
+To create parameters from the path, prepend a colon (:) in front of a path slice like you would with a Clojure keyword. For example a string such as `/hi/:name` would match any string that matches the `\/hi\/.*` regex. The `:name` itself will then be available with its value from the `request` passed to the response function, like this:
 
 ```clojure
 (fn [req]
@@ -96,6 +120,8 @@ To create parameters from the path, prepend a colon (:) in front of a path slice
     {:status 200
      :body (str "Hi, " name)}))
 ```
+
+Additionally, you may want to use an optional parameter, in which case you'd want to add a question mark to the end of it, like `/hi/:name?`, which will match the `\/hi\/?.*?` regex, meaning that the previous forward slash is optional, and what comes after that is also optional.
 
 #### `:method`
 
@@ -131,6 +157,14 @@ Or a function returning a map:
 What the actual map can contain that you return depends again on the HTTP server you decided to use Ruuter with. The examples I've noted here are based on [http-kit](https://github.com/http-kit/http-kit) & [ring + jetty](https://github.com/ring-clojure/ring), but feel free to make a PR with additions for other HTTP servers.
 
 ## Changelog
+
+### 1.2.0
+
+- Implemented optional route parameters, so now you can do paths like `/hi/:name?` in your routes, and it would match the route even if the `:name` is not present. All you have to do is add a question mark to the parameter, and that's it.
+
+- Changed Ruuter from a .clj file to a .cljc file, so it would also work with ClojureScript. Although it would probably require a more hands-on set-up than just a drop-in to an HTTP server like http-kit or ring + jetty, there is no reason that the router itself wouldn't work as it does not rely on any platform-specific code.
+
+- Ruuter also works with [Babashka](https://github.com/babashka/babashka), and I've created a "Setting up with Babashka" section in this README to show that.
 
 ### 1.1.0
 
