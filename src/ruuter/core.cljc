@@ -1,6 +1,6 @@
 (ns ruuter.core
   (:require [clojure.string :as string])
-  (:gen-class))
+  #?(:clj (:gen-class)))
 
 
 (defn- path->regex-path
