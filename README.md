@@ -32,9 +32,9 @@ This will attempt to match a route with the request map and return the matched r
 
 Note that the `request-method` doesn't have to be a keyword, it can be anything that your HTTP server returns. But it does have to be called `request-method` for the router to know where to look for. 
 
-### Setting up with http-kit
+### Setting up with [http-kit](https://github.com/http-kit/http-kit)
 
-Now, obviously on its own the router is not very useful as it needs an actual HTTP server to return the responses to the world, so here's an example that uses http-kit:
+Now, obviously on its own the router is not very useful as it needs an actual HTTP server to return the responses to the world, so here's an example that uses [http-kit](https://github.com/http-kit/http-kit):
 
 ```clojure
 (ns myapp.core
