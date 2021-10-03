@@ -1,6 +1,8 @@
 (ns ruuter.core-test
-  (:require [clojure.test :refer :all]
-            [ruuter.core :as ruuter]))
+  #?(:clj (:require [clojure.test :refer :all]
+                    [ruuter.core :as ruuter]))
+  #?(:cljs (:require [cljs.test :refer-macros [deftest testing is]]
+                     [ruuter.core :as ruuter])))
 
 
 (deftest path+uri->path-params-test
