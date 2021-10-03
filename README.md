@@ -158,6 +158,12 @@ What the actual map can contain that you return depends again on the HTTP server
 
 ## Changelog
 
+### 1.2.2
+
+- Fixed an issue where CLJS compilation would fail because of the `(:gen-class)` that is JVM-only. 
+
+- Tests are now runnable for CLJS as well, via `clojure -Atest`. 
+
 ### 1.2.1
 
 - Fixed an issue with regex parsing. Sorry about that.
