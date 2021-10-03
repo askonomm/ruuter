@@ -158,6 +158,10 @@ What the actual map can contain that you return depends again on the HTTP server
 
 ## Changelog
 
+### 1.2.1
+
+- Fixed an issue with regex parsing. Sorry about that.
+
 ### 1.2.0
 
 - Implemented optional route parameters, so now you can do paths like `/hi/:name?` in your routes, and it would match the route even if the `:name` is not present. All you have to do is add a question mark to the parameter, and that's it.

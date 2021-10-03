@@ -24,8 +24,7 @@
                  :else
                  ; what comes around, goes around
                  %))
-         (string/join "\\/")
-         (re-pattern))))
+         (string/join "\\/"))))
 
 
 (defn- path+uri->path-params
@@ -62,7 +61,7 @@
   (let [route (->> routes
                    (filter #(not (= :not-found (:path %))))
                    (map #(merge % {:regex-path (path->regex-path (:path %))}))
-                   (filter #(and (re-matches (:regex-path %) uri)
+                   (filter #(and (re-matches (re-pattern (:regex-path %)) uri)
                                  (= (:method %) request-method)))
                    first)]
     (when route
