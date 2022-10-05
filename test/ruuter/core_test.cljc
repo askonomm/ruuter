@@ -4,7 +4,6 @@
   #?(:cljs (:require [cljs.test :refer-macros [deftest testing is]]
                      [ruuter.core :as ruuter])))
 
-
 (deftest path+uri->path-params-test
   (let [testfn #'ruuter/path+uri->path-params]
     (testing "No params returns an empty map"
@@ -22,8 +21,16 @@
              (testfn "/hello/:who/:why?" "/hello/world")))
       (is (= {:who "world"
               :why "because"}
-             (testfn "/hello/:who/:why?" "/hello/world/because"))))))
-
+             (testfn "/hello/:who/:why?" "/hello/world/because"))))
+    (testing "Multiple params, but all are optional"
+      (is (= {:who "world"
+              :why "because"}
+             (testfn "hello/:who?/:why?" "/hello/world/because")))
+      (is (= {:who "world"}
+             (testfn "hello/:who?/:why?" "/hello/world"))))
+    (testing "Wildcard param"
+      (is (= {:everything* "this/means/literally/everything"}
+             (testfn "hello/:everything*" "/hello/this/means/literally/everything"))))))
 
 (deftest match-route-test
   (let [testfn #'ruuter/match-route]
@@ -39,7 +46,6 @@
     (testing "No route found"
       (is (= nil
              (testfn [] "/hello" :get))))))
-
 
 (deftest route+req->response-test
   (let [testfn #'ruuter/route+req->response]

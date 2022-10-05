@@ -122,6 +122,10 @@ To create parameters from the path, prepend a colon (:) in front of a path slice
 
 Additionally, you may want to use an optional parameter, in which case you'd want to add a question mark to the end of it, like `/hi/:name?`, which will match the `\/hi\/?.*?` regex, meaning that the previous forward slash is optional, and what comes after that is also optional.
 
+##### Wildcard matching
+
+The above-mentioned `:name` and `:name?` only match in its own sequence, e.g inside a space of two slashes. They cannot, by design, match the whole URL path. If you need wildcard matching, instead use `:name*`, which will match everything, including forward slashes.
+
 #### `:method`
 
 The HTTP method to listen for when matching the given path. This can be whatever the HTTP server uses. For example, if you're using http-kit for the HTTP server then the accepted values are:
@@ -156,6 +160,11 @@ Or a function returning a map:
 What the actual map can contain that you return depends again on the HTTP server you decided to use Ruuter with. The examples I've noted here are based on [http-kit](https://github.com/http-kit/http-kit) & [ring + jetty](https://github.com/ring-clojure/ring), but feel free to make a PR with additions for other HTTP servers.
 
 ## Changelog
+
+### 1.3.0
+
+- Fixed an issue with optional parameters not matching correctly when there were multiple optional paremeters in use.
+- Implemented wildcard parameters in the form of `:name*`, which will match everything including forward slashes.
 
 ### 1.2.2
 

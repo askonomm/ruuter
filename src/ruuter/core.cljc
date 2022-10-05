@@ -1,57 +1,74 @@
 (ns ruuter.core
-  (:require [clojure.string :as string])
+  (:require
+    [clojure.string :as string])
   #?(:clj (:gen-class)))
-
 
 (defn- path->regex-path
   "Takes in a raw route `path` and turns it into a regex pattern to
   match against the request URI."
   [path]
-  (if (= "/" path)
-    "\\/"
-    (->> (string/split path #"/")
-         (map #(cond
-                 ; matches anything, and must be present
-                 ; for example `:name`
-                 (and (string/starts-with? % ":")
-                      (not (string/ends-with? % "?")))
-                 ".*"
-                 ; matches anything, but is optional
-                 ; for example `:name?`
-                 (and (string/starts-with? % ":")
-                      (string/ends-with? % "?"))
-                 "?.*?"
-                 :else
-                 ; what comes around, goes around
-                 %))
-         (string/join "\\/"))))
+  (cond (= "/" path)
+        "\\/"
 
+        (re-find #"\*" path)
+        (-> (string/replace path #"\:.*?\*" ".*?")
+            (string/replace #"/" "\\/"))
+
+        :else
+        (->> (string/split path #"/")
+             (map #(cond
+                     ; matches anything, and must be present
+                     ; for example `:name`
+                     (and (string/starts-with? % ":")
+                          (not (string/ends-with? % "?")))
+                     ".*"
+                     ; matches anything, but is optional
+                     ; for example `:name?`
+                     (and (string/starts-with? % ":")
+                          (string/ends-with? % "?"))
+                     "?.*?"
+                     :else
+                     ; what comes around, goes around
+                     %))
+             (string/join "\\/"))))
 
 (defn- path+uri->path-params
   "Takes a raw route `path` and the actual request `uri`, which it then
   turns into a map of k:v, if any parameters were used in the `path`."
   [path uri]
-  (if (= "/" path)
-    {}
-    (let [split-path (string/split path #"/")
-          split-uri (string/split uri #"/")]
-      (into {} (map-indexed
-                 (fn [idx item]
-                   (cond
-                     ; required parameter
-                     (and (string/starts-with? item ":")
-                          (not (string/ends-with? item "?")))
-                     {(keyword (subs item 1)) (get split-uri idx)}
-                     ; optional parameter
-                     (and (string/starts-with? item ":")
-                          (string/ends-with? item "?")
-                          (get split-uri idx))
-                     {(keyword (-> item
-                                   (subs 0 (- (count item) 1))
-                                   (subs 1)))
-                      (get split-uri idx)}))
-                 split-path)))))
+  (cond (= "/" path)
+        {}
 
+        (re-find #"\*" path)
+        (let [index-of-k-start (string/index-of path ":")
+              k (-> (subs path (+ 1 index-of-k-start))
+                    keyword)
+              v (subs uri (+ 1 index-of-k-start))]
+          {k v})
+
+        :else
+        (let [split-path (->> (string/split path #"/")
+                              (remove empty?)
+                              vec)
+              split-uri (->> (string/split uri #"/")
+                             (remove empty?)
+                             vec)]
+          (into {} (map-indexed
+                     (fn [idx item]
+                       (cond
+                         ; required parameter
+                         (and (string/starts-with? item ":")
+                              (not (string/ends-with? item "?")))
+                         {(keyword (subs item 1)) (get split-uri idx)}
+                         ; optional parameter
+                         (and (string/starts-with? item ":")
+                              (string/ends-with? item "?")
+                              (get split-uri idx))
+                         {(keyword (-> item
+                                       (subs 0 (- (count item) 1))
+                                       (subs 1)))
+                          (get split-uri idx)}))
+                     split-path)))))
 
 (defn- match-route
   "For a collection of `route`, will attempt to find one that matches
@@ -66,7 +83,6 @@
                    first)]
     (when route
       (dissoc route :regex-path))))
-
 
 (defn- route+req->response
   "Given the current route and the current HTTP request, it will
@@ -95,7 +111,6 @@
     :else
     {:status 404
      :body "Not found."}))
-
 
 (defn route
   "For a given collection of `routes` and the current HTTP request as
