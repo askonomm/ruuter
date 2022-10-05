@@ -42,8 +42,10 @@
         (re-find #"\*" path)
         (let [index-of-k-start (string/index-of path ":")
               k (-> (subs path (+ 1 index-of-k-start))
+                    drop-last
+                    string/join
                     keyword)
-              v (subs uri (+ 1 index-of-k-start))]
+              v (subs uri index-of-k-start)]
           {k v})
 
         :else

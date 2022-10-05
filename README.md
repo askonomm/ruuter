@@ -103,7 +103,7 @@ You can also use Ruuter with [Babashka](https://github.com/babashka/babashka), b
 
 ### Creating routes
 
-Like mentioned above, each route is a map inside of a vector - the order is important only in that the route matcher will return the first result it finds according to `:path`. 
+Like mentioned above, each route is a map inside a vector - the order is important only in that the route matcher will return the first result it finds according to `:path`. 
 
 Each route consists of three items:
 
@@ -160,6 +160,14 @@ Or a function returning a map:
 What the actual map can contain that you return depends again on the HTTP server you decided to use Ruuter with. The examples I've noted here are based on [http-kit](https://github.com/http-kit/http-kit) & [ring + jetty](https://github.com/ring-clojure/ring), but feel free to make a PR with additions for other HTTP servers.
 
 ## Changelog
+
+### 1.3.2
+
+- When using wildcard parameters, the keyword returned in ´:params´ of a request was ´:name*´, but aiming for consistency with an optional parameter where we remove the question mark ´?´, the asterisk has been removed. 
+
+### 1.3.1 
+
+- A small bugfix related to wildcard parameters losing the first character in the result.
 
 ### 1.3.0
 

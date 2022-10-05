@@ -27,10 +27,10 @@
               :why "because"}
              (testfn "hello/:who?/:why?" "/hello/world/because")))
       (is (= {:who "world"}
-             (testfn "hello/:who?/:why?" "/hello/world"))))
+             (testfn "/hello/:who?/:why?" "/hello/world"))))
     (testing "Wildcard param"
-      (is (= {:everything* "this/means/literally/everything"}
-             (testfn "hello/:everything*" "/hello/this/means/literally/everything"))))))
+      (is (= {:everything "this/means/literally/everything"}
+             (testfn "/hello/:everything*" "/hello/this/means/literally/everything"))))))
 
 (deftest match-route-test
   (let [testfn #'ruuter/match-route]
