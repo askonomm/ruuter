@@ -111,7 +111,11 @@ Each route consists of three items:
 
 A string path starting with a forward slash describing the URL path to match. 
 
-To create parameters from the path, prepend a colon (:) in front of a path slice like you would with a Clojure keyword. For example a string such as `/hi/:name` would match any string that matches the `\/hi\/.*` regex. The `:name` itself will then be available with its value from the `request` passed to the response function, like this:
+To create parameters from the path, prepend a colon (:) in front of a path slice like you would with a Clojure keyword. 
+
+##### Required parameters
+
+A required parameter with a string such as `/hi/:name`, which would match any string that matches the `\/hi\/.*` regex in the URI, in its own slice. The `:name` itself will then be available with its value from the `request` passed to the response function, like this:
 
 ```clojure
 (fn [req]
@@ -120,11 +124,20 @@ To create parameters from the path, prepend a colon (:) in front of a path slice
      :body (str "Hi, " name)}))
 ```
 
-Additionally, you may want to use an optional parameter, in which case you'd want to add a question mark to the end of it, like `/hi/:name?`, which will match the `\/hi\/?.*?` regex, meaning that the previous forward slash is optional, and what comes after that is also optional.
+##### Optional parameters
 
-##### Wildcard matching
+A optional parameter with a string such as `/hi/:name?`, which would match any string that matches the `\/hi\/?.*?` regex in the URI, in its own slice. If there is a `:name` provided in the URI then it will then be available with its value from the `request` passed to the response function, like this:
 
-The above-mentioned `:name` and `:name?` only match in its own sequence, e.g inside a space of two slashes. They cannot, by design, match the whole URL path. If you need wildcard matching, instead use `:name*`, which will match everything, including forward slashes.
+```clojure
+(fn [req]
+  (let [name (:name (:params req))]
+    {:status 200
+     :body (str "Hi, " name)}))
+```
+
+##### Wildcard parameters
+
+The above-mentioned `:name` and `:name?` only match in its own path slice, e.g inside a space surrounded by two forward slashes. They cannot, by design, match the whole URL path. If you need wildcard matching, instead use `:name*`, which will match everything, including forward slashes.
 
 #### `:method`
 
