@@ -174,6 +174,10 @@ What the actual map can contain that you return depends again on the HTTP server
 
 ## Changelog
 
+### 1.3.3
+
+- Removed ClojureScript from dependencies to make the bundle size smaller in case you want to use Ruuter with nbb.
+
 ### 1.3.2
 
 - When using wildcard parameters, the keyword returned in ´:params´ of a request was ´:name*´, but aiming for consistency with an optional parameter where we remove the question mark ´?´, the asterisk has been removed. 
