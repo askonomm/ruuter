@@ -1,10 +1,14 @@
 # Ruuter
 
-A tiny, zero dependency HTTP router for Clojure(Script) that operates with a simple data structure where each route is a map inside a vector. Yup, that's it. No magic, no bullshit. 
+A tiny, zero dependency, system-agnostic router for Clojure, ClojureScript, Babashka and NBB that operates with a simple data structure where each route is a map inside a vector. Yup, that's it. No magic, no bullshit. 
 
 ## Installation
 
 [![Clojars Project](https://img.shields.io/clojars/v/org.clojars.askonomm/ruuter.svg)](https://clojars.org/org.clojars.askonomm/ruuter)
+
+## Articles
+
+- [Routing with Ruuter in a Reagent / Re-frame project](https://asko.sh/blog/routing-with-ruuter-in-reagent-reframe-project/)
 
 ## Usage
 
@@ -30,7 +34,7 @@ Require the namespace `ruuter.core` and then pass your routes to the `route` fun
 
 This will attempt to match a route with the request map and return the matched route' response. If no route was found, it will attempt to find a route that has a `:path` that is `:not-found`, and return its response instead. But if not even that route was found, it will simply return a built-in 404 response instead.
 
-Note that the `request-method` doesn't have to be a keyword, it can be anything that your HTTP server returns. But it does have to be called `request-method` for the router to know where to look for. 
+Note that the `request-method` doesn't have to be a keyword, it can be anything that your HTTP server returns. But it does have to be called `request-method` for the router to know where to look for. That said, you do not have to provide neither `method` in the route, nor `request-method` in the request if you don't want to. You can skip both of them and let Ruuter route based on the `:uri` alone if you want.
 
 ### Setting up with [http-kit](https://github.com/http-kit/http-kit)
 
