@@ -49,22 +49,47 @@
 
 (deftest route+req->response-test
   (let [testfn #'ruuter/route+req->response]
-    (testing "Returning a map when the response is a direct map"
-      (= {:status 200
-          :body "Hello."}
-         (testfn {:path "/hello"
-                  :response {:status 200
-                             :body "Hello."}}
-                 {:uri "/hello"})))
-    (testing "Returning a map via a fn when the response is a fn"
-      (= {:status 200
-          :body "Hello, world."}
-         (testfn {:path "/hello/:who"
-                  :response (fn [req]
-                              {:status 200
-                               :body (str "Hello, " (:who (:params req)))})}
-                 {:uri "/hello/world"})))
-    (testing "Returning an error map when route is invalid"
-      (= {:status 404
-          :body "Not found."}
-         (testfn nil {:uri "/hello"})))))
+    (testing "Returns a map when the response is a direct map"
+      (is (= {:status 200
+              :body "Hello."}
+             (testfn {:path "/hello"
+                      :response {:status 200
+                                 :body "Hello."}}
+                     {:uri "/hello"}))))
+    (testing "Returns a map via a fn when the response is a fn"
+      (is (= {:status 200
+              :body "Hello, world."}
+             (testfn {:path "/hello/:who"
+                      :response (fn [req]
+                                  {:status 200
+                                   :body (str "Hello, " (:who (:params req)) ".")})}
+                     {:uri "/hello/world"}))))
+    (testing "Returns an error map when route is invalid"
+      (is (= {:status 404
+              :body "Not found."}
+             (testfn nil {:uri "/hello"}))))
+
+    (testing "Returns a combined :params map"
+      (let [params (atom nil)]
+        (testfn {:path "/hello/:who"
+                 :response (fn [req]
+                             (reset! params (:params req))
+                             {:status 200
+                              :body ""})}
+                {:uri "/hello/world"
+                 :params {:some-params :from-elsewhere}})
+        (is (= {:who "world"
+                :some-params :from-elsewhere}
+               @params))))
+
+    (testing "Overwrites :params if needed"
+      (let [params (atom nil)]
+        (testfn {:path "/hello/:who"
+                 :response (fn [req]
+                             (reset! params (:params req))
+                             {:status 200
+                              :body ""})}
+                {:uri "/hello/world"
+                 :params {:who "overwritten"}})
+        (is (= {:who "overwritten"}
+               @params))))))

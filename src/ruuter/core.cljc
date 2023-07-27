@@ -3,6 +3,16 @@
     [clojure.string :as string])
   #?(:clj (:gen-class)))
 
+(defn deep-merge [& maps]
+  (letfn [(reconcile-keys [val-in-result val-in-latter]
+            (if (and (map? val-in-result)
+                     (map? val-in-latter))
+              (merge-with reconcile-keys val-in-result val-in-latter)
+              val-in-latter))
+          (reconcile-maps [result latter]
+            (merge-with reconcile-keys result latter))]
+    (reduce reconcile-maps maps)))
+
 (defn- path->regex-path
   "Takes in a raw route `path` and turns it into a regex pattern to
   match against the request URI."
@@ -105,8 +115,8 @@
     ; when using a function, you get the whole `req` and params
     ; with it as well.
     (fn? response)
-    (response (->> {:params (path+uri->path-params path uri)}
-                   (merge req)))
+    (response (-> {:params (path+uri->path-params path uri)}
+                  (deep-merge req)))
     ; if by whatever reason we make it here it must mean the
     ; route is invalid, or doesn't exist, in which case we return
     ; an error message.
