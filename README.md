@@ -8,7 +8,7 @@ A tiny, zero dependency, system-agnostic router for Clojure, ClojureScript, Baba
 
 ## Articles
 
-- [Routing with Ruuter in a Reagent / Re-frame project](https://asko.itypd.com/routing-with-ruuter-in-a-reagent-re-frame-project)
+- [Routing with Ruuter in a Reagent / Re-frame project](https://nmm.ee/routing-with-ruuter-in-a-reagent-re-frame-project)
 
 ## Usage
 
