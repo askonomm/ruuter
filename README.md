@@ -178,6 +178,11 @@ What the actual map can contain that you return depends again on the HTTP server
 
 ## Changelog
 
+### 1.3.5
+
+- Fixes an issue where the usage of wildcard parameters [did not work quite right](https://github.com/askonomm/ruuter/issues/7).
+- Added test cases to cover the fix
+
 ### 1.3.4
 
 - Fixes an issue where if used with middlewares (like Ring), or really anything that passes a `:params` key from outside of Ruuter in the request, Ruuter overwrites the `:params` key with its own parametarization. It now does a deep merge instead, with the outside parameters having priority. This means that Ruuter parameters will remain unless overwritten, and should co-exist with outside parameters nicely. [Issue #6](https://github.com/askonomm/ruuter/issues/6).
