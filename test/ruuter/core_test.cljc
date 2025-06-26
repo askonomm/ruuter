@@ -30,7 +30,18 @@
              (testfn "/hello/:who?/:why?" "/hello/world"))))
     (testing "Wildcard param"
       (is (= {:everything "this/means/literally/everything"}
-             (testfn "/hello/:everything*" "/hello/this/means/literally/everything"))))))
+             (testfn "/hello/:everything*" "/hello/this/means/literally/everything"))))
+    (testing "Normal params and wildcard param in the end"
+      (is (= {:id "123"
+              :path "foo.txt"}
+             (testfn "/user/:id/file/:path*" "/user/123/file/foo.txt")))
+      (is (= {:id "123"
+              :path "a/b/c/foo.txt"}
+             (testfn "/user/:id/file/:path*" "/user/123/file/a/b/c/foo.txt")))
+      (is (= {:id "123"
+              :path "a/b/c/foo.txt"
+              :sub-path "b/c/foo.txt"}
+             (testfn "/user/:id/file/:path*/:sub-path*" "/user/123/file/a/b/c/foo.txt"))))))
 
 (deftest match-route-test
   (let [testfn #'ruuter/match-route]

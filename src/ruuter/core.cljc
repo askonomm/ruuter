@@ -49,15 +49,6 @@
   (cond (= "/" path)
         {}
 
-        (re-find #"\*" path)
-        (let [index-of-k-start (string/index-of path ":")
-              k (-> (subs path (+ 1 index-of-k-start))
-                    drop-last
-                    string/join
-                    keyword)
-              v (subs uri index-of-k-start)]
-          {k v})
-
         :else
         (let [split-path (->> (string/split path #"/")
                               (remove empty?)
@@ -70,8 +61,17 @@
                        (cond
                          ; required parameter
                          (and (string/starts-with? item ":")
-                              (not (string/ends-with? item "?")))
+                              (not (string/ends-with? item "?"))
+                              (not (string/ends-with? item "*")))
                          {(keyword (subs item 1)) (get split-uri idx)}
+                         ; required wildcard parameter
+                         (and (string/starts-with? item ":")
+                              (string/ends-with? item "*"))
+                         {(keyword (-> item
+                                       (subs 0 (- (count item) 1))
+                                       (subs 1)))
+                          (->> (drop idx split-uri)
+                               (string/join "/"))}
                          ; optional parameter
                          (and (string/starts-with? item ":")
                               (string/ends-with? item "?")
